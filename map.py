@@ -21,22 +21,28 @@ def color_producer(elev):
         return "red"
 
 # an pbject to be added to map
-fg = folium.FeatureGroup(name="My Map")
+fgv = folium.FeatureGroup(name="Volcanoes")
 
 # loop over the lat, long and elevation an puts a marker on every
 #location
 for lt, ln, el in zip(lat, lon, elev):
-    fg.add_child(folium.Marker(location=[lt,ln]
-     , popup= str(el)+ " meters" ,
+    fgv.add_child(folium.Marker(location=[lt,ln]
+     , popup= str(el)+ " meters",
+     icon=folium.Icon(color=color_producer(el), icon='cloud')))
 
-     icon=folium.Icon(color=color_producer(el), icon='cloud'
-     )))
+fgp = folium.FeatureGroup(name="Population")
+
 #added a layer that has lines around continents and coutries
-fg.add_child(folium.GeoJson(
+# also changes the color of countries based on Population
+fgp.add_child(folium.GeoJson(
 data=open('world.json','r', encoding='utf-8-sig').read(),
  style_function=lambda x: {'fillColor': 'yellow' if
  x['properties']['POP2005'] < 10000000 else 'orange'
  if 10000000 <= x['properties']['POP2005'] <20000000 else 'red'}))
 
-map.add_child(fg)
+#adds FeatureGroup (has all the layers) to the map
+map.add_child(fgv)
+map.add_child(fgp)
+# adds ability to control the layers implemented
+map.add_child(folium.LayerControl())
 map.save("Map1.html")
